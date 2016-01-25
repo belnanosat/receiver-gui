@@ -27,13 +27,19 @@ cur_angle = 0
 curx = 0
 run = True
 
+def calc_checksum(a):
+    checksum = 0
+    for b in a:
+        checksum = checksum ^ b
+    return checksum
+
 while run:
     if curx < 100.0 or packet.altitude > 5.0:
         packet.altitude = -5 * (curx - 100.0)**2 + 50001.0
         packet.temperature_internal = -packet.altitude / 1000.0 + 20
         packet.temperature_external = -packet.altitude / 1000.0
         packet.pressure = int((100.0 - packet.altitude / 2500.0) * 1000)
-        packet.bmp180_temperature = int(-packet.altitude / 1000.0 + 20 + 1.0)
+        packet.bmp180_temperature = 10#int(-packet.altitude / 1000.0 + 20 + 1.0)
         packet.longitude = start_longitude + cur_radius * math.cos(cur_angle)
         packet.latitude = start_latitude + cur_radius * math.sin(cur_angle)
         packet.radiation = 10.0 + packet.altitude / 1000.0
@@ -43,28 +49,17 @@ while run:
     packet.packet_id += 1
     curx += 1.0
     packet.voltage -= 0.01
-#    print("Length: {}".format(len(packet.SerializeToString())))
-    curs = google.protobuf.text_format.MessageToString(packet, as_one_line=True)
-    hashsum = 0
-    for b in bytearray(curs, 'utf8'):
-        hashsum = hashsum ^ b
-    # Simulation of noise in a radio channel
-    if curx % 2 == 0:
-        hashsum = hashsum ^ 1
-    curs += "*" + "%0.2X" % hashsum
-    # curs = packet.SerializeToString();
-    # curs += struct.pack('B', hashsum)
-    # for b in curs:
-    #     hashsum = hashsum ^ b
-    # if curx % 2 == 0:
-    #     hashsum = hashsum ^ 1
-    for c in curs:
-       # sys.stdout.buffer.write(struct.pack('B', c))
-       # sys.stdout.buffer.flush()
-        sys.stdout.write(c)
-        sys.stdout.flush()
+
+    curs = packet.SerializeToString();
+    ress = struct.pack('B', len(curs))
+    ress += curs
+    ress += struct.pack('B', calc_checksum(ress))
+    while len(ress) < 59:
+        ress += struct.pack('B', 0)
+    # print("Length: {}".format(len(packet.SerializeToString())))
+    # print(google.protobuf.text_format.MessageToString(packet, as_one_line=True))
+    for c in ress:
+        sys.stdout.buffer.write(struct.pack('B', c))
+        sys.stdout.buffer.flush()
         time.sleep(0.01)
-    sys.stdout.write('\n')
-    sys.stdout.flush()
-    time.sleep(0.001)
-#    run = False
+    time.sleep(0.1)

@@ -39,10 +39,17 @@ MainWindow::MainWindow(QWidget *parent) :
     qDebug() << "Starting!!!";
     child = new QProcess(this);
     QStringList arguments;
-    child->start("../flightsim/flightsim.py", arguments);
-    child->waitForStarted();
+    //child->start("../flightsim/flightsim.py", arguments);
+    //arguments.append("/dev/ttyUSB0");
+    //arguments.append("38400");
+    //child->start("screen", arguments);
+    //child->waitForStarted();
+    serial.setBaudRate(QSerialPort::Baud38400);
+    serial.setPortName("/dev/ttyUSB0");
+    while (!serial.open(QIODevice::ReadOnly));
+    qDebug() << serial.errorString() << serial.error();
     qDebug() << child->state() << child->errorString();
-    connect(child, SIGNAL(readyRead()), this, SLOT(displayInputText()));
+    connect(&serial, SIGNAL(readyRead()), this, SLOT(displayInputText()));
     mapWidget = new MyMarbleWidget(ui->tab_2);
     mapWidget->setObjectName(QStringLiteral("MarbleWidget"));
     mapWidget->setGeometry(QRect(50, 30, 891, 391));
@@ -137,10 +144,11 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::displayInputText()  {
-    QString s = child->read(256);
-    QTextStream stream(log_file);
-    stream << s;
-    ui->textEdit->setPlainText(ui->textEdit->toPlainText() + s);
+    QByteArray s = serial.read(256);
+    qDebug() << s;
+    //QTextStream stream(log_file);
+    //stream << s;
+    //ui->textEdit->setPlainText(ui->textEdit->toPlainText() + s);
     QScrollBar *sb = ui->textEdit->verticalScrollBar();
     sb->setValue(sb->maximum());
     int i = 0;
@@ -149,28 +157,28 @@ void MainWindow::displayInputText()  {
         int percentage = std::min(100, cur_packet.length() * 100 / packet_max_length);
         ui->progressBar->setValue(percentage);
     }
-    while (i < cur_packet.length()) {
-        while (i < cur_packet.length() && cur_packet[i] != '\n') ++i;
-        if (i < cur_packet.length()) {
-            // We've received a complete packet
-            qDebug() << "packet: " << cur_packet.length();
-            packet_max_length = std::max(packet_max_length, i);
-            QString tmp = cur_packet.left(i);
-            TelemetryPacket packet;
-            QPalette Pal(palette());
-            bool correct = readPacket(tmp, &packet);
-            if (correct) {
-                Pal.setColor(QPalette::Background, Qt::green);
-                processPacket(packet);
-            } else {
-                Pal.setColor(QPalette::Background, Qt::red);
-            }
-            ui->checksumStatus->setAutoFillBackground(true);
-            ui->checksumStatus->setPalette(Pal);
-            ui->checksumStatus->show();
-            cur_packet = cur_packet.right(cur_packet.length() - i - 1);
-            i = 0;
+    int plength = 76;
+    while (plength <= cur_packet.length()) {
+        // We've received a complete packet
+        qDebug() << "packet: " << cur_packet.length();
+        if (cur_packet.length() == 77) {
+            volatile int a = 6;
         }
+        packet_max_length = std::max(packet_max_length, plength);
+        QByteArray tmp = cur_packet.left(plength);
+        TelemetryPacket packet;
+        QPalette Pal(palette());
+        bool correct = readPacket(tmp, &packet);
+        if (correct) {
+            Pal.setColor(QPalette::Background, Qt::green);
+            processPacket(packet);
+        } else {
+            Pal.setColor(QPalette::Background, Qt::red);
+        }
+        ui->checksumStatus->setAutoFillBackground(true);
+        ui->checksumStatus->setPalette(Pal);
+        ui->checksumStatus->show();
+        cur_packet = cur_packet.right(cur_packet.length() - plength);
     }
 }
 
@@ -181,23 +189,23 @@ void MainWindow::toggleMapCenter(int state) {
     }
 }
 
-bool MainWindow::readPacket(const QString &s, TelemetryPacket *packet) {
-    if (s.length() >= 3 && s[s.length() - 3] == '*') {
-        // There is a chance that checksum is correct
-        bool status = false;
-        uint expected_checksum = s.right(2).toUInt(&status, 16);
-        uint checksum = 0;
-        for (int i = 0; i + 3 < s.length(); ++i) {
-            checksum ^= s[i].unicode();
+bool MainWindow::readPacket(const QByteArray &s, TelemetryPacket *packet) {
+    if (s.length() >= 2) {
+        uchar length = s[0];
+        if (length > 74) return false;
+        uchar expected_checksum = s[length + 1];
+        uchar checksum = 0;
+        for (int i = 0; i <= length; ++i) {
+            checksum ^= s[i];
         }
         if (checksum != expected_checksum) {
             qDebug() << checksum << " " << expected_checksum;
             return false;
         }
+        packet->ParseFromString(s.left(length + 1).right(length).toStdString());
     } else {
         return false;
     }
-    google::protobuf::TextFormat::ParseFromString(s.left(s.length() - 3).toStdString(), packet);
     return true;
 }
 
@@ -208,6 +216,7 @@ void MainWindow::processPacket(const TelemetryPacket& packet) {
     ui->lineEdit_longitude->setText(QString::number(packet.longitude()));
     ui->lineEdit_latitude->setText(QString::number(packet.latitude()));
     ui->lineEdit_pressure->setText(QString::number(packet.pressure()));
+    ui->lineEdit_bmp180_temperature->setText(QString::number(packet.bmp180_temperature() / 10.0));
     ui->lineEdit_internal_temperature->setText(QString::number(packet.temperature_internal()));
     ui->lineEdit_external_temperature->setText(QString::number(packet.temperature_external()));
     ui->lineEdit_voltage->setText(QString::number(packet.voltage()));

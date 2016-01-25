@@ -10,6 +10,8 @@
 #include "telemetrypacketwrapper.h"
 #include "qcustomplot.h"
 
+#include <QtSerialPort/QSerialPort>
+
 namespace Marble {
 class GeoDataPlacemark;
 class MarbleWidget;
@@ -72,7 +74,7 @@ public slots:
     void updatePlotSettings(int plot_id, QPair<int, QVector<int> > settings);
 
 protected:
-    bool readPacket(const QString& s, TelemetryPacket* packet);
+    bool readPacket(const QByteArray& s, TelemetryPacket* packet);
     void processPacket(const TelemetryPacket& packet);
     void redrawPlots();
 
@@ -80,7 +82,8 @@ private:
     QFile *log_file;
     Ui::MainWindow *ui;
     QProcess *child;
-    QString cur_packet;
+    QByteArray cur_packet, cur_partial_packet;
+    QSerialPort serial;
     Marble::GeoDataPlacemark *place;
     MyMarbleWidget* mapWidget;
     QVector<TelemetryPacket> packets;
