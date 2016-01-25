@@ -1,0 +1,14 @@
+syntax = "proto3";
+message TelemetryPacket {
+	int32 packet_id = 1;
+	uint32 status = 2;
+	float temperature_internal = 3;
+	float temperature_external = 4;
+	float altitude = 5;
+	float latitude = 6;
+	float longitude = 7;
+	int32 pressure = 8;
+	int32 bmp180_temperature = 9;
+	float voltage = 10;
+	float radiation = 11;
+}

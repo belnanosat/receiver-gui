@@ -1,0 +1,11 @@
+# Build files #
+###############
+build/
+*.pb.*
+*_pb2.py
+
+# Other files #
+###############
+*.user
+__pycache__/
+
