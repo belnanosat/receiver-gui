@@ -26,9 +26,16 @@ static QVector<double (*)(const TelemetryPacket&)> telemetry_values = {
     TelemetryPacketWrapper::latitude,
     TelemetryPacketWrapper::longitude,
     TelemetryPacketWrapper::pressure,
+    TelemetryPacketWrapper::bmp180_temperature,
     TelemetryPacketWrapper::voltage,
     TelemetryPacketWrapper::radiation,
 };
+
+static float ConvertDS18B20Temperature(int16_t raw_temperature) {
+    float temperature = raw_temperature;
+    temperature /= 16.0f;
+    return temperature;
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -36,13 +43,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     timer.start();
     ui->setupUi(this);
-    qDebug() << "Starting!!!";
     child = new QProcess(this);
     QStringList arguments;
     //child->start("../flightsim/flightsim.py", arguments);
-    //arguments.append("/dev/ttyUSB0");
-    //arguments.append("38400");
-    //child->start("screen", arguments);
     //child->waitForStarted();
     serial.setBaudRate(QSerialPort::Baud38400);
     serial.setPortName("/dev/ttyUSB0");
@@ -145,7 +148,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::displayInputText()  {
     QByteArray s = serial.read(256);
-    qDebug() << s;
     //QTextStream stream(log_file);
     //stream << s;
     //ui->textEdit->setPlainText(ui->textEdit->toPlainText() + s);
@@ -157,13 +159,10 @@ void MainWindow::displayInputText()  {
         int percentage = std::min(100, cur_packet.length() * 100 / packet_max_length);
         ui->progressBar->setValue(percentage);
     }
-    int plength = 76;
+    int plength = 105;
     while (plength <= cur_packet.length()) {
         // We've received a complete packet
         qDebug() << "packet: " << cur_packet.length();
-        if (cur_packet.length() == 77) {
-            volatile int a = 6;
-        }
         packet_max_length = std::max(packet_max_length, plength);
         QByteArray tmp = cur_packet.left(plength);
         TelemetryPacket packet;
@@ -221,6 +220,24 @@ void MainWindow::processPacket(const TelemetryPacket& packet) {
     ui->lineEdit_external_temperature->setText(QString::number(packet.temperature_external()));
     ui->lineEdit_voltage->setText(QString::number(packet.voltage()));
     ui->lineEdit_radiation->setText(QString::number(packet.radiation()));
+
+    if (packet.has_ds18b20_temperature1()) {
+        ui->lineEdit_ds18b20_temperature1->setText(
+                    QString::number(ConvertDS18B20Temperature(packet.ds18b20_temperature1())));
+    }
+    if (packet.has_ds18b20_temperature2()) {
+        ui->lineEdit_ds18b20_temperature2->setText(
+                    QString::number(ConvertDS18B20Temperature(packet.ds18b20_temperature2())));
+    }
+    if (packet.has_ds18b20_temperature3()) {
+        ui->lineEdit_ds18b20_temperature3->setText(
+                    QString::number(ConvertDS18B20Temperature(packet.ds18b20_temperature3())));
+    }
+    if (packet.has_ds18b20_temperature4()) {
+        ui->lineEdit_ds18b20_temperature4->setText(
+                    QString::number(ConvertDS18B20Temperature(packet.ds18b20_temperature4())));
+    }
+
     mapWidget->addCoordinate(packet.longitude(), packet.latitude());
     if (ui->checkBox->isChecked()) {
         mapWidget->centerOn(Marble::GeoDataCoordinates(packet.longitude(), packet.latitude(), 0, Marble::GeoDataCoordinates::Degree));

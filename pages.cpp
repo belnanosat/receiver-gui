@@ -11,6 +11,7 @@ QVector<QString> telemetry_values = {
     QObject::tr("Latitude"),
     QObject::tr("Longitude"),
     QObject::tr("Pressure"),
+    QObject::tr("BMP180 temperature"),
     QObject::tr("Voltage"),
     QObject::tr("Radiation"),
 };

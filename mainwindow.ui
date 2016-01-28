@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1002</width>
-    <height>617</height>
+    <width>1080</width>
+    <height>778</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -185,6 +185,74 @@
                <string>BMP180 temperature</string>
               </property>
              </widget>
+            </item>
+            <item row="9" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="font">
+               <font>
+                <pointsize>20</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>DS18B20 temperature 1</string>
+              </property>
+             </widget>
+            </item>
+            <item row="10" column="0">
+             <widget class="QLabel" name="label_11">
+              <property name="font">
+               <font>
+                <pointsize>20</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>DS18B20 temperature 2</string>
+              </property>
+             </widget>
+            </item>
+            <item row="11" column="0">
+             <widget class="QLabel" name="label_12">
+              <property name="font">
+               <font>
+                <pointsize>20</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>DS18B20 temperature 3</string>
+              </property>
+             </widget>
+            </item>
+            <item row="12" column="0">
+             <widget class="QLabel" name="label_13">
+              <property name="font">
+               <font>
+                <pointsize>20</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>DS18B20 temperature 4</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="1">
+             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature1"/>
+            </item>
+            <item row="10" column="1">
+             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature2"/>
+            </item>
+            <item row="11" column="1">
+             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature3"/>
+            </item>
+            <item row="12" column="1">
+             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature4"/>
             </item>
            </layout>
           </item>
@@ -398,7 +466,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1002</width>
+     <width>1080</width>
      <height>30</height>
     </rect>
    </property>

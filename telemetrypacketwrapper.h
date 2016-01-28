@@ -26,6 +26,9 @@ public:
     static double pressure(const TelemetryPacket& p) {
         return p.pressure();
     }
+    static double bmp180_temperature(const TelemetryPacket& p) {
+        return p.bmp180_temperature();
+    }
     static double voltage(const TelemetryPacket& p) {
         return p.voltage();
     }
