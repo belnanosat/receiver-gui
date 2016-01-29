@@ -15,6 +15,20 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2">
+    <item row="4" column="0">
+     <widget class="QLabel" name="checksumStatus">
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
     <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
@@ -100,6 +114,24 @@
             <item row="3" column="1">
              <widget class="QLineEdit" name="lineEdit_pressure"/>
             </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="label_9">
+              <property name="font">
+               <font>
+                <pointsize>20</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>BMP180 temperature</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="lineEdit_bmp180_temperature"/>
+            </item>
             <item row="5" column="0">
              <widget class="QLabel" name="label_6">
               <property name="font">
@@ -113,6 +145,9 @@
                <string>External temperature</string>
               </property>
              </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QLineEdit" name="lineEdit_external_temperature"/>
             </item>
             <item row="6" column="0">
              <widget class="QLabel" name="label_7">
@@ -128,6 +163,9 @@
               </property>
              </widget>
             </item>
+            <item row="6" column="1">
+             <widget class="QLineEdit" name="lineEdit_voltage"/>
+            </item>
             <item row="7" column="0">
              <widget class="QLabel" name="label_8">
               <property name="font">
@@ -141,12 +179,6 @@
                <string>Radiation</string>
               </property>
              </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QLineEdit" name="lineEdit_external_temperature"/>
-            </item>
-            <item row="6" column="1">
-             <widget class="QLineEdit" name="lineEdit_voltage"/>
             </item>
             <item row="7" column="1">
              <widget class="QLineEdit" name="lineEdit_radiation"/>
@@ -168,24 +200,6 @@
             <item row="8" column="1">
              <widget class="QLineEdit" name="lineEdit_internal_temperature"/>
             </item>
-            <item row="4" column="1">
-             <widget class="QLineEdit" name="lineEdit_bmp180_temperature"/>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_9">
-              <property name="font">
-               <font>
-                <pointsize>20</pointsize>
-                <weight>75</weight>
-                <italic>false</italic>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>BMP180 temperature</string>
-              </property>
-             </widget>
-            </item>
             <item row="9" column="0">
              <widget class="QLabel" name="label_10">
               <property name="font">
@@ -199,6 +213,9 @@
                <string>DS18B20 temperature 1</string>
               </property>
              </widget>
+            </item>
+            <item row="9" column="1">
+             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature1"/>
             </item>
             <item row="10" column="0">
              <widget class="QLabel" name="label_11">
@@ -214,6 +231,9 @@
               </property>
              </widget>
             </item>
+            <item row="10" column="1">
+             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature2"/>
+            </item>
             <item row="11" column="0">
              <widget class="QLabel" name="label_12">
               <property name="font">
@@ -227,6 +247,9 @@
                <string>DS18B20 temperature 3</string>
               </property>
              </widget>
+            </item>
+            <item row="11" column="1">
+             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature3"/>
             </item>
             <item row="12" column="0">
              <widget class="QLabel" name="label_13">
@@ -242,17 +265,66 @@
               </property>
              </widget>
             </item>
-            <item row="9" column="1">
-             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature1"/>
-            </item>
-            <item row="10" column="1">
-             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature2"/>
-            </item>
-            <item row="11" column="1">
-             <widget class="QLineEdit" name="lineEdit_ds18b20_temperature3"/>
-            </item>
             <item row="12" column="1">
              <widget class="QLineEdit" name="lineEdit_ds18b20_temperature4"/>
+            </item>
+            <item row="13" column="0">
+             <widget class="QLabel" name="label_15">
+              <property name="font">
+               <font>
+                <pointsize>20</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Acceleration</string>
+              </property>
+             </widget>
+            </item>
+            <item row="14" column="0">
+             <widget class="QLabel" name="label_14">
+              <property name="font">
+               <font>
+                <pointsize>20</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Angular speed</string>
+              </property>
+             </widget>
+            </item>
+            <item row="13" column="1">
+             <widget class="QWidget" name="widget" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <widget class="QLineEdit" name="lineEdit_accelerometer_x"/>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineEdit_accelerometer_y"/>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineEdit_accelerometer_z"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="14" column="1">
+             <widget class="QWidget" name="widget_2" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_12">
+               <item>
+                <widget class="QLineEdit" name="lineEdit_gyroscope_x"/>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineEdit_gyroscope_y"/>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="lineEdit_gyroscope_z"/>
+               </item>
+              </layout>
+             </widget>
             </item>
            </layout>
           </item>
@@ -378,6 +450,16 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_6">
+       <attribute name="title">
+        <string>IMU</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QOpenGLWidget" name="openGLWidget"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
         <string>Log</string>
@@ -438,24 +520,10 @@
       </widget>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="3" column="0">
      <widget class="QProgressBar" name="progressBar">
       <property name="value">
        <number>24</number>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="checksumStatus">
-      <property name="font">
-       <font>
-        <pointsize>20</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string/>
       </property>
      </widget>
     </item>

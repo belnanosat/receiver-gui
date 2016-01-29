@@ -146,6 +146,18 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void unstuffData(const QByteArray &data, QByteArray &unstuffed_data) {
+    int next_zero = data[0];
+    for (int i = 1; i < data.length(); ++i) {
+        if (i < next_zero) {
+            unstuffed_data[i - 1] = data[i];
+        } else {
+            unstuffed_data[i - 1] = 0;
+            next_zero = i + data[i];
+        }
+    }
+}
+
 void MainWindow::displayInputText()  {
     QByteArray s = serial.read(256);
     //QTextStream stream(log_file);
@@ -153,21 +165,26 @@ void MainWindow::displayInputText()  {
     //ui->textEdit->setPlainText(ui->textEdit->toPlainText() + s);
     QScrollBar *sb = ui->textEdit->verticalScrollBar();
     sb->setValue(sb->maximum());
-    int i = 0;
     cur_packet += s;
     if (packet_max_length > -1) {
         int percentage = std::min(100, cur_packet.length() * 100 / packet_max_length);
         ui->progressBar->setValue(percentage);
     }
-    int plength = 105;
-    while (plength <= cur_packet.length()) {
+    int i = 0;
+    while (i < cur_packet.length()) {
+        if (cur_packet[i] != 0) {
+            ++i;
+            continue;
+        }
         // We've received a complete packet
-        qDebug() << "packet: " << cur_packet.length();
-        packet_max_length = std::max(packet_max_length, plength);
-        QByteArray tmp = cur_packet.left(plength);
+        qDebug() << "packet: " << i + 1;
+        packet_max_length = std::max(packet_max_length, i + 1);
+        QByteArray tmp = cur_packet.left(i);
+        QByteArray unstuffed_data(tmp.length() - 2, 0);
+        unstuffData(tmp, unstuffed_data);
         TelemetryPacket packet;
         QPalette Pal(palette());
-        bool correct = readPacket(tmp, &packet);
+        bool correct = readPacket(unstuffed_data, &packet);
         if (correct) {
             Pal.setColor(QPalette::Background, Qt::green);
             processPacket(packet);
@@ -177,7 +194,7 @@ void MainWindow::displayInputText()  {
         ui->checksumStatus->setAutoFillBackground(true);
         ui->checksumStatus->setPalette(Pal);
         ui->checksumStatus->show();
-        cur_packet = cur_packet.right(cur_packet.length() - plength);
+        cur_packet = cur_packet.right(cur_packet.length() - i - 1);
     }
 }
 
@@ -190,18 +207,16 @@ void MainWindow::toggleMapCenter(int state) {
 
 bool MainWindow::readPacket(const QByteArray &s, TelemetryPacket *packet) {
     if (s.length() >= 2) {
-        uchar length = s[0];
-        if (length > 74) return false;
-        uchar expected_checksum = s[length + 1];
+        uchar expected_checksum = s[s.length() - 1];
         uchar checksum = 0;
-        for (int i = 0; i <= length; ++i) {
+        for (int i = 0; i + 1 < s.length(); ++i) {
             checksum ^= s[i];
         }
         if (checksum != expected_checksum) {
             qDebug() << checksum << " " << expected_checksum;
             return false;
         }
-        packet->ParseFromString(s.left(length + 1).right(length).toStdString());
+        packet->ParseFromString(s.left(s.length() - 1).toStdString());
     } else {
         return false;
     }
@@ -236,6 +251,32 @@ void MainWindow::processPacket(const TelemetryPacket& packet) {
     if (packet.has_ds18b20_temperature4()) {
         ui->lineEdit_ds18b20_temperature4->setText(
                     QString::number(ConvertDS18B20Temperature(packet.ds18b20_temperature4())));
+    }
+
+    if (packet.has_acceleration_x()) {
+        ui->lineEdit_accelerometer_x->setText(
+                    QString::number(packet.acceleration_x()));
+    }
+    if (packet.has_acceleration_y()) {
+        ui->lineEdit_accelerometer_y->setText(
+                    QString::number(packet.acceleration_y()));
+    }
+    if (packet.has_acceleration_z()) {
+        ui->lineEdit_accelerometer_z->setText(
+                    QString::number(packet.acceleration_z()));
+    }
+
+    if (packet.has_gyroscope_x()) {
+        ui->lineEdit_gyroscope_x->setText(
+                    QString::number(packet.gyroscope_x()));
+    }
+    if (packet.has_gyroscope_y()) {
+        ui->lineEdit_gyroscope_y->setText(
+                    QString::number(packet.gyroscope_y()));
+    }
+    if (packet.has_gyroscope_z()) {
+        ui->lineEdit_gyroscope_z->setText(
+                    QString::number(packet.gyroscope_z()));
     }
 
     mapWidget->addCoordinate(packet.longitude(), packet.latitude());
