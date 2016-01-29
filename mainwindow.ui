@@ -56,12 +56,12 @@
                </font>
               </property>
               <property name="text">
-               <string>GPS longitude</string>
+               <string>Packet id</string>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QLineEdit" name="lineEdit_longitude"/>
+             <widget class="QLineEdit" name="lineEdit_packet_id"/>
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="label_3">
@@ -73,12 +73,12 @@
                </font>
               </property>
               <property name="text">
-               <string>GPS latitude</string>
+               <string>Timestamp</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QLineEdit" name="lineEdit_latitude"/>
+             <widget class="QLineEdit" name="lineEdit_timestamp"/>
             </item>
             <item row="2" column="0">
              <widget class="QLabel" name="label_5">
@@ -90,7 +90,7 @@
                </font>
               </property>
               <property name="text">
-               <string>GPS altitude</string>
+               <string>Pressure altitude</string>
               </property>
              </widget>
             </item>

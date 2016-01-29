@@ -227,8 +227,8 @@ void MainWindow::processPacket(const TelemetryPacket& packet) {
     packets.push_back(packet);
     place->setCoordinate( packet.longitude(), packet.latitude(), 0, Marble::GeoDataCoordinates::Degree );
     ui->lineEdit_altitude->setText(QString::number(packet.altitude()));
-    ui->lineEdit_longitude->setText(QString::number(packet.longitude()));
-    ui->lineEdit_latitude->setText(QString::number(packet.latitude()));
+    ui->lineEdit_packet_id->setText(QString::number(packet.packet_id()));
+    ui->lineEdit_timestamp->setText(QString::number(packet.timestamp()));
     ui->lineEdit_pressure->setText(QString::number(packet.pressure()));
     ui->lineEdit_bmp180_temperature->setText(QString::number(packet.bmp180_temperature() / 10.0));
     ui->lineEdit_internal_temperature->setText(QString::number(packet.temperature_internal()));
